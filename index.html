@@ -305,16 +305,16 @@
           <button class="theme-btn" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
             <i class="fa-solid fa-wand-magic-sparkles"></i><span id="theme-label">Beautiful</span>
           </button>
-          <button class="theme-btn" id="test-mode-btn" aria-label="Modo prueba" title="Modo prueba">
+          <!-- <button class="theme-btn" id="test-mode-btn" aria-label="Modo prueba" title="Modo prueba">
             <i class="fa-solid fa-vial"></i><span class="btn-label">Modo prueba</span>
-          </button>
+          </button> -->
           <button class="install-btn" id="install-btn" aria-label="Instalar app" style="display:none;">
             <i class="fa-solid fa-download"></i><span id="install-label">Instalar</span>
           </button>
         </div>
-        <div class="chip test-chip" title="Modo prueba activo">
+        <!-- <div class="chip test-chip" title="Modo prueba activo">
           <span>🧪</span><strong>TEST</strong>
-        </div>
+        </div> -->
         <div class="chip" title="Puntos">
           <span>🏆</span>
           <strong id="contador-puntos">0</strong>
@@ -416,7 +416,7 @@
         <div>1) Arranca 1 hoja al día real. Si te saltas días, se acumulan pendientes.</div>
         <div>2) Beautiful: confeti + lluvia de 🌸 + sonido suave. Warrior: “clack” de garra + vibración.</div>
         <div>3) +3 puntos por hoja arrancada.</div>
-        <div>4) Modo Prueba para QA: añade pendientes, resetea la de hoy o reinicia el bloc.</div>
+        <!-- <div>4) Modo Prueba para QA: añade pendientes, resetea la de hoy o reinicia el bloc.</div> -->
         <div>5) Mantén pulsado 3s la hoja para un easter egg.</div>
       </div>
       <div class="modal-actions">
@@ -837,15 +837,15 @@
     function completeLongPress(){ cancelLongPress(); }
 
     // Modo prueba
-    function toggleTestMode(){
-      testMode = !testMode;
-      document.body.classList.toggle('test-on', testMode);
-      testBar.style.display = testMode ? 'flex' : 'none';
-      showToast(testMode ? 'Modo prueba ON' : 'Modo prueba OFF');
-      saveState();
-      updateSilkUI();
-    }
-    testModeBtn.addEventListener('click', toggleTestMode);
+    // function toggleTestMode(){
+    //   testMode = !testMode;
+    //   document.body.classList.toggle('test-on', testMode);
+    //   testBar.style.display = testMode ? 'flex' : 'none';
+    //   showToast(testMode ? 'Modo prueba ON' : 'Modo prueba OFF');
+    //   saveState();
+    //   updateSilkUI();
+    // }
+    // testModeBtn.addEventListener('click', toggleTestMode);
     qaAddBacklog.addEventListener('click', ()=>{ testBacklog += 1; saveState(); updateSilkUI(); });
     qaResetToday.addEventListener('click', ()=>{ silkLastTear = ''; saveState(); updateSilkUI(); showToast('Hoja de hoy reseteada'); });
     qaResetAll.addEventListener('click', ()=>{
