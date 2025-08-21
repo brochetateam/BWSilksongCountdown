@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Beautiful Warrior · Silksong Countdown</title>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#ffebf4" id="meta-theme-color">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png" sizes="180x180">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Staatliches&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root { --radius: 16px; --ring-w: clamp(10px, 3.4vw, 18px); --shadow-elev: 0 10px 30px rgba(0,0,0,0.18); }
+
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text); background: var(--bg); line-height: 1.35;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      transition: background 400ms ease, color 300ms ease;
+    }
+    h1, h2, .display { font-family: 'Staatliches', 'Poppins', sans-serif; letter-spacing: .5px; }
+    a { color: inherit; text-decoration: none; }
+
+    /* Temas */
+    body[data-theme="beautiful"] {
+      --bg: radial-gradient(1200px 800px at 10% -10%, #ffe3f1 0%, #fff6fb 30%, #fff 70%) fixed,
+            linear-gradient(180deg, #fff 0%, #ffe9f6 100%) fixed;
+      --text: #2b1b2d;
+      --muted: #8d4e84;
+      --surface: rgba(255, 255, 255, 0.78);
+      --border: rgba(255, 20, 130, 0.18);
+      --accent: #ff3c91;
+      --accent-2: #ff8ac9;
+      --glow: rgba(255, 60, 145, 0.35);
+      --btn-text: #fff;
+      --btn-bg: #ff3c91;
+      --btn-bg-2: #ff5aa4;
+      --header-grad: linear-gradient(90deg, #ff3c91, #ff8ac9);
+      --chip: rgba(255, 60, 145, 0.12);
+      --chip-border: rgba(255, 60, 145, 0.25);
+      --paper: linear-gradient(180deg, #fff 0%, #fff5fb 100%);
+      --paper-ink: #2b1b2d;
+      --paper-edge: #ffd1e6;
+      --tape: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.4));
+    }
+    body[data-theme="warrior"] {
+      --bg: radial-gradient(1000px 600px at 80% -20%, #1a0006 0%, #0b0506 45%, #0a0a0c 100%) fixed,
+            linear-gradient(180deg, #0a0a0c 0%, #0f0f12 100%) fixed;
+      --text: #f7f7f9;
+      --muted: #ffb0b4;
+      --surface: rgba(34, 34, 40, 0.92);
+      --border: rgba(255, 120, 130, 0.45);
+      --accent: #ff3a4a;
+      --accent-2: #ff7a85;
+      --glow: rgba(255, 60, 70, 0.48);
+      --btn-text: #fff;
+      --btn-bg: #ff3a4a;
+      --btn-bg-2: #ff6b76;
+      --header-grad: linear-gradient(90deg, #ff3a4a, #ff8b94);
+      --chip: rgba(255, 58, 74, 0.16);
+      --chip-border: rgba(255, 120, 130, 0.45);
+      --paper: linear-gradient(180deg, #121217 0%, #1c1c24 100%);
+      --paper-ink: #f5f5f7;
+      --paper-edge: #5c1117;
+      --tape: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+
+    .container { max-width: 980px; margin: 0 auto; padding: 16px; }
+    header.app { position: relative; padding: 16px 0 8px; }
+
+    .app-bar { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; position: relative; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand h1 {
+      font-size: clamp(22px, 4.2vw, 32px); line-height: 1; margin: 0;
+      background: var(--header-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-shadow: 0 2px 30px var(--glow);
+    }
+    .product-badge { margin-left: 8px; padding: 4px 10px; border-radius: 999px; font-weight: 800; letter-spacing: 1px;
+      background: linear-gradient(180deg, var(--btn-bg), var(--btn-bg-2)); color: #fff; font-size: 42px; box-shadow: 0 8px 18px -6px var(--glow); align-self: flex-start; }
+    .product-badge.product-mobile { display: none; }
+    .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    .right-controls { display: flex; align-items: center; gap: 8px; }
+    .right-actions-row { display: flex; gap: 8px; align-items: center; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 8px 12px; background: var(--chip); border: 1px solid var(--chip-border); color: var(--text); backdrop-filter: blur(6px); }
+
+    .theme-btn, .install-btn {
+      border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text);
+      padding: 8px 12px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+      transition: transform 140ms ease, box-shadow 180ms ease, background 240ms ease; box-shadow: var(--shadow-elev); backdrop-filter: blur(6px);
+    }
+    .theme-btn:hover, .install-btn:hover { transform: translateY(-1px); }
+
+    .bg-decor { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-decor span { position: absolute; bottom: -8vh; opacity: 0.75; filter: blur(0.3px); animation: rise var(--dur) linear infinite; transform: translateY(0) scale(var(--s, 1)); }
+    @keyframes rise { from { transform: translateY(0) scale(var(--s, 1)); opacity: 0; } 10% { opacity: 0.65; } to { transform: translateY(-120vh) scale(var(--s, 1)); opacity: 0; } }
+
+    .intro { opacity: 0; transform: translateY(16px); animation: fadeUp .6s ease forwards; }
+    .intro-delayed { opacity: 0; transform: translateY(16px); animation: fadeUp .8s .1s ease forwards; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* Card */
+    .card { position: relative; margin: 16px auto 20px; padding: clamp(14px, 3.5vw, 22px); background: var(--surface); border: 1px solid var(--border); border-radius: calc(var(--radius) + 6px); box-shadow: var(--shadow-elev); z-index: 1; backdrop-filter: blur(8px); }
+    .mode-line { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
+    .mode-title { font-size: clamp(18px, 4.3vw, 28px); margin: 0; text-align: left; }
+    .mode-sub { color: var(--muted); font-size: 14px; margin-top: 4px; text-align: left; }
+
+    /* ===== Post-it Silksong ===== */
+    .silk-wrap { display:grid; place-items:center; margin-top: 8px; }
+    .note-pad {
+      position: relative;
+      width: min(92vw, 520px);
+      height: clamp(200px, 50vw, 300px);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.18);
+      border: 1px dashed var(--border);
+      overflow: visible;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    .stack { position:absolute; inset: 12px; }
+
+    .note-sheet, .note-sheet.behind {
+      position: absolute; inset: 0;
+      border-radius: 8px; background: var(--paper); color: var(--paper-ink);
+      border: 2px solid var(--paper-edge);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.14);
+      display: grid; place-items: center; will-change: transform;
+    }
+    .note-sheet.behind { filter: blur(0.4px) brightness(0.98); opacity: 0.75; transform: translateY(6px) scale(0.996); }
+    .note-sheet.behind.second { opacity: 0.5; transform: translateY(12px) scale(0.992); }
+
+    /* Cinta de post-it arriba */
+    .note-tape { position:absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg); width: 48%; height: 18px; border-radius: 4px; background: var(--tape); box-shadow: 0 6px 12px rgba(0,0,0,0.08); pointer-events:none; }
+
+    .sheet-content { text-align:center; padding: 10px; }
+    .d-number { font-size: clamp(42px, 12vw, 80px); font-weight: 800; letter-spacing: 1px; }
+    .date-line { margin-top: 2px; font-size: 14px; color: var(--muted); }
+    .hint { margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+    .note-sheet.ripping { transition: transform 160ms ease; }
+    .note-sheet.torn { pointer-events: none; animation: peelAway 520ms cubic-bezier(.2,.7,.2,1) forwards; }
+    @keyframes peelAway {
+      0% { transform: translateY(0) rotate(0deg); opacity:1; }
+      60% { transform: translateY(80%) rotate(6deg); opacity:0.95; }
+      100% { transform: translateY(150%) rotate(12deg); opacity:0; }
+    }
+
+    /* Marcas de garra en Warrior */
+    .slash-marks {
+      position:absolute; inset: 10px; pointer-events:none; opacity:.12; display:none;
+      background:
+        linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.25) 45%, transparent 50%),
+        linear-gradient(118deg, transparent 42%, rgba(255,255,255,0.22) 47%, transparent 52%),
+        linear-gradient(122deg, transparent 44%, rgba(255,255,255,0.20) 49%, transparent 54%);
+      -webkit-mask-image: radial-gradient(100% 60% at top center, #000 60%, transparent 61%);
+      mask-image: radial-gradient(100% 60% at top center, #000 60%, transparent 61%);
+    }
+    body[data-theme="warrior"] .slash-marks { display:block; }
+
+    .shake { animation: shake 180ms ease-in-out 1; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+
+    /* Pétalos */
+    .petal { position: fixed; top:-10px; font-size: 20px; pointer-events:none; z-index: 20; opacity: 0.95; }
+
+    /* Modo prueba */
+    .test-chip { display:none; }
+    .test-on .test-chip { display:inline-flex; }
+    #test-bar { display:none; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
+    .test-on #test-bar { display:flex; }
+
+    /* Móvil */
+    @media (max-width: 640px) {
+      .brand { align-items: flex-start; }
+      .brand h1 { font-size: clamp(16px, 5vw, 20px); }
+      .product-badge { display: none; }
+      .product-badge.product-mobile { display: inline-block; font-size: 36px; padding: 4px 12px; margin: 6px auto 0; background: linear-gradient(180deg, var(--btn-bg), var(--btn-bg-2)); color: #fff; box-shadow: 0 6px 14px -4px var(--glow); }
+
+      .right-controls { position: absolute; top: 6px; right: 10px; flex-direction: column; align-items: flex-end; gap: 4px; }
+      .right-actions-row { gap: 4px; }
+      .theme-btn, .install-btn { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+      #theme-label, #install-label { display: none; }
+
+      .mode-line { grid-template-columns: 1fr; justify-items: center; gap: 6px; }
+      .mode-title { font-size: clamp(16px, 4.5vw, 24px); }
+      .mode-sub { font-size: 13px; }
+
+      .card { margin: 8px auto 12px; padding: clamp(10px, 2.8vw, 18px); }
+      footer { padding: 8px 0 12px; font-size: 12px; }
+    }
+
+    footer { padding: 12px 0 20px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    /* Evitar desplazamiento en PWA móvil */
+    @media (max-width: 640px) {
+      body { position: fixed; overflow: hidden; width: 100%; height: 100%; }
+    }
+    .standalone-mode { -webkit-user-select: none; user-select: none; touch-action: none; }
+    .standalone-mode * { touch-action: manipulation; }
+  </style>
+</head>
+
+<body data-theme="beautiful">
+  <div class="bg-decor" aria-hidden="true" id="decor"></div>
+
+  <header class="app intro">
+    <div class="container app-bar">
+      <div class="brand">
+        <!-- Gato -->
+        <div class="cat-hero" title="Beautiful Warrior" id="catHero" style="width: clamp(44px, 9vw, 74px); height: clamp(44px, 9vw, 74px); display: grid; place-items: center; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-elev); backdrop-filter: blur(6px); overflow: hidden;">
+          <!-- Beautiful -->
+          <svg viewBox="0 0 100 100" data-variant="beautiful" aria-hidden="true" style="width:100%; height:100%; transform: translateY(1px); animation: bob 3s ease-in-out infinite;">
+            <defs><linearGradient id="bandanaPink" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff8ac9"/><stop offset="100%" stop-color="#ff3c91"/></linearGradient></defs>
+            <circle cx="50" cy="54" r="30" fill="#fff" stroke="#ffb3d5" stroke-width="2"/>
+            <path d="M30,36 L22,20 L36,28 Z" fill="#fff" stroke="#ffb3d5" />
+            <path d="M70,36 L78,20 L64,28 Z" fill="#fff" stroke="#ffb3d5" />
+            <path d="M20,45 Q50,28 80,45 L80,50 Q50,35 20,50 Z" fill="url(#bandanaPink)" />
+            <circle cx="72" cy="50" r="5" fill="url(#bandanaPink)" />
+            <circle cx="40" cy="60" r="4.5" fill="#333" />
+            <circle cx="60" cy="60" r="4.5" fill="#333" />
+            <path d="M50 66c-2-4-8 0-4 3 2 1 4-2 4-2s2 3 4 2c4-3-2-7-4-3z" fill="#ff4c86"/>
+            <circle cx="34" cy="66" r="3.2" fill="#ffd1e6" />
+            <circle cx="66" cy="66" r="3.2" fill="#ffd1e6" />
+            <path d="M20 62 H34 M20 67 H32" stroke="#e7a7c8" stroke-width="2" stroke-linecap="round"/>
+            <path d="M80 62 H66 M80 67 H68" stroke="#e7a7c8" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <!-- Warrior -->
+          <svg viewBox="0 0 100 100" data-variant="warrior" aria-hidden="true" style="display:none; width:100%; height:100%; transform: translateY(1px); animation: bob 3s ease-in-out infinite;">
+            <defs><linearGradient id="bandanaRed" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#ff2438"/></linearGradient></defs>
+            <circle cx="50" cy="54" r="30" fill="#0e0e12" stroke="#5c1117" stroke-width="2"/>
+            <path d="M30,36 L22,20 L36,28 Z" fill="#0e0e12" stroke="#5c1117" />
+            <path d="M70,36 L78,20 L64,28 Z" fill="#0e0e12" stroke="#5c1117" />
+            <polygon points="78,20 73,26 70,20" fill="#0e0e12" />
+            <path d="M20,45 Q50,28 80,45 L80,50 Q50,35 20,50 Z" fill="url(#bandanaRed)" />
+            <path d="M74,48 l6,3 -5,5" fill="url(#bandanaRed)" />
+            <circle cx="40" cy="60" r="4.5" fill="#f3f3f3" />
+            <path d="M56,58 q4,0 8,2 q-4,4-8,4 q-4,0-8-4 q4-2 8-2z" fill="#f3f3f3" />
+            <path d="M46 66 L50 70 L54 66 Z" fill="#ff3c3c"/>
+            <path d="M68 48 L54 64" stroke="#ff8a8a" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M20 62 H34 M20 67 H32" stroke="#6a2a2a" stroke-width="2" stroke-linecap="round"/>
+            <path d="M80 62 H66 M80 67 H68" stroke="#6a2a2a" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div>
+          <div style="display:flex; align-items:flex-start; gap:8px; flex-wrap:wrap;">
+            <h1>Beautiful Warrior</h1>
+            <div class="product-badge" aria-label="Producto">COUNTDOWN</div>
+          </div>
+          <div class="sub">Silksong Hype Ritual ✨</div>
+          <div class="product-badge product-mobile">COUNTDOWN</div>
+        </div>
+      </div>
+
+      <div class="right-controls">
+        <div class="right-actions-row">
+          <button class="theme-btn" id="theme-btn" aria-label="Cambiar tema">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span id="theme-label">Beautiful</span>
+          </button>
+          <button class="theme-btn" id="test-mode-btn" aria-label="Modo prueba">
+            <i class="fa-solid fa-vial"></i>
+            <span class="btn-label">Modo prueba</span>
+          </button>
+          <button class="install-btn" id="install-btn" aria-label="Instalar app" style="display:none;">
+            <i class="fa-solid fa-download"></i>
+            <span id="install-label">Instalar</span>
+          </button>
+        </div>
+        <div class="chip test-chip" title="Modo prueba activo">
+          <span>🧪</span><strong>TEST</strong>
+        </div>
+        <div class="chip" title="Puntos">
+          <span>🏆</span>
+          <strong id="contador-puntos">0</strong>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container intro-delayed">
+    <section class="card countdown-card" aria-label="Cuenta atrás Silksong">
+      <div class="mode-line">
+        <div>
+          <h2 class="mode-title"><i class="fa-solid fa-feather-pointed"></i> Silksong: Hype Ritual</h2>
+          <div class="mode-sub" id="silk-sub">Calculando días...</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="silk-share" class="theme-btn" aria-label="Compartir"><i class="fa-solid fa-share-nodes"></i><span class="btn-label">Compartir</span></button>
+        </div>
+      </div>
+
+      <div class="silk-wrap">
+        <div class="note-pad" id="note-pad" aria-label="Bloc de días arrancables">
+          <div class="stack">
+            <div class="note-sheet behind second" aria-hidden="true"></div>
+            <div class="note-sheet behind" aria-hidden="true"></div>
+
+            <div class="note-sheet" id="note-sheet" role="button" aria-roledescription="Arrastrar hacia abajo para arrancar hoja" title="Arrastra hacia abajo para arrancar la hoja de hoy">
+              <div class="note-tape" aria-hidden="true"></div>
+              <div class="sheet-content">
+                <div class="d-number" id="silk-d-number">D-—</div>
+                <div class="date-line">Lanzamiento: 4 sep 2025</div>
+                <div class="hint" id="silk-hint">Arrastra hacia abajo para arrancar ✨</div>
+              </div>
+              <div class="slash-marks"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra QA visible en Modo Prueba -->
+        <div id="test-bar" class="cta-row">
+          <button class="theme-btn" id="qa-add-backlog"><i class="fa-solid fa-layer-group"></i><span class="btn-label">+1 hoja pendiente</span></button>
+          <button class="theme-btn" id="qa-reset-today"><i class="fa-solid fa-arrows-rotate"></i><span class="btn-label">Reset hoja de hoy</span></button>
+          <button class="theme-btn" id="qa-reset-all"><i class="fa-solid fa-trash-can"></i><span class="btn-label">Reiniciar bloc</span></button>
+        </div>
+      </div>
+
+      <div class="cta-row" id="silk-cta" style="display:none;">
+        <div class="glow-cta"><i class="fa-solid fa-flag-checkered"></i> ¡Es hoy! Que empiece la aventura.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="cta-row">
+      <button id="reglas-btn" class="glow-cta"><i class="fa-solid fa-book"></i> Reglas del ritual</button>
+    </div>
+    Hype con estilo<br>Made with <span style="color:#ff3c91;">❤</span><br>© 2025 Little Bug Games<br>
+  </footer>
+
+  <!-- Reglas -->
+  <div id="modal-reglas" class="modal" role="dialog" aria-modal="true" aria-labelledby="rules-title" style="position: fixed; inset: 0; background: rgba(0,0,0,0.50); display: grid; place-items: center; visibility: hidden; opacity: 0; transition: opacity 220ms ease, visibility 220ms ease; z-index: 10; padding: 18px; backdrop-filter: blur(2px);">
+    <div class="modal-card" style="width: min(560px, 96vw); background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; box-shadow: var(--shadow-elev);">
+      <h3 id="rules-title" style="font-size:22px; margin:8px 0 12px; display:flex; align-items:center; gap:8px; background: var(--header-grad); -webkit-background-clip:text; background-clip:text; color:transparent;">
+        <i class="fa-solid fa-book"></i> Reglas del Hype Ritual
+      </h3>
+      <div class="grid" style="display:grid; gap:10px; color:var(--text);">
+        <div>1) Arranca 1 hoja al día real. Si te saltas días, se acumulan pendientes.</div>
+        <div>2) Beautiful: confeti + lluvia de 🌸 al arrancar. Warrior: “clack” de garra y marcas.</div>
+        <div>3) +3 puntos por hoja arrancada. El hype también suma.</div>
+        <div>4) Modo Prueba sirve para QA: añade hojas pendientes, resetea la de hoy, reinicia el bloc.</div>
+        <div>5) Si intentas avanzar el tiempo: chascarrillo y nos vemos mañana 😉</div>
+      </div>
+      <div class="modal-actions" style="display:flex; gap:10px; justify-content:flex-end; margin-top:12px;">
+        <button id="cerrar-reglas" class="theme-btn"><i class="fa-solid fa-check"></i> <span class="btn-label">Entendido</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" style="position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); border: 1px solid var(--border); padding: 8px 12px; border-radius: 999px; box-shadow: var(--shadow-elev); opacity: 0; visibility: hidden; transition: 200ms ease; z-index: 15;">+3 puntos</div>
+
+  <script>
+    // ====== Elementos ======
+    const themeBtn = document.getElementById('theme-btn');
+    const themeLabel = document.getElementById('theme-label');
+    const metaThemeColor = document.getElementById('meta-theme-color');
+    const installBtn = document.getElementById('install-btn');
+    const decor = document.getElementById('decor');
+
+    const puntosElement = document.getElementById('contador-puntos');
+    const toast = document.getElementById('toast');
+    const catHero = document.getElementById('catHero');
+
+    const silkSub = document.getElementById('silk-sub');
+    const silkShareBtn = document.getElementById('silk-share');
+    const notePad = document.getElementById('note-pad');
+    const noteSheet = document.getElementById('note-sheet');
+    const silkDNumber = document.getElementById('silk-d-number');
+    const silkHint = document.getElementById('silk-hint');
+    const silkCTA = document.getElementById('silk-cta');
+
+    const reglasBtn = document.getElementById('reglas-btn');
+    const modalReglas = document.getElementById('modal-reglas');
+    const cerrarReglas = document.getElementById('cerrar-reglas');
+
+    const testModeBtn = document.getElementById('test-mode-btn');
+    const testBar = document.getElementById('test-bar');
+    const qaAddBacklog = document.getElementById('qa-add-backlog');
+    const qaResetToday = document.getElementById('qa-reset-today');
+    const qaResetAll = document.getElementById('qa-reset-all');
+
+    // ====== Estado ======
+    let puntos = 0;
+    let audioContext;
+    let deferredPrompt = null;
+
+    // Silksong
+    const SILK_TARGET_LOCAL = '2025-09-04'; // medianoche local
+    let silkInitialDays = null; // D real al primer arranque
+    let silkTearCount = 0;      // hojas arrancadas desde el inicio
+    let silkLastTear = '';      // YYYY-MM-DD
+    let timeOffsetMs = 0;       // corrección horaria (si online)
+    let offsetFetchedAt = 0;    // ts de última sync
+    let testMode = false;       // QA
+    let testBacklog = 0;        // hojas pendientes adicionales en QA
+
+    // ====== Util ======
+    function setTheme(theme){
+      document.body.setAttribute('data-theme',theme);
+      themeLabel.textContent = theme==='beautiful' ? 'Beautiful' : 'Warrior';
+      metaThemeColor.setAttribute('content', theme==='beautiful' ? '#ffebf4' : '#0f0f12');
+      // Toggle gato variant
+      const svgs = catHero.querySelectorAll('svg');
+      svgs.forEach(svg => svg.style.display = 'none');
+      const variant = theme==='beautiful' ? '[data-variant="beautiful"]' : '[data-variant="warrior"]';
+      catHero.querySelector(variant).style.display = 'block';
+    }
+    function toggleTheme(){ const next=document.body.getAttribute('data-theme')==='beautiful'?'warrior':'beautiful'; setTheme(next); saveState(); spawnDecor(); }
+    themeBtn.addEventListener('click', toggleTheme);
+
+    function formatYMD(ms){ const d=new Date(ms); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${dd}`; }
+    function startOfDayMs(ms){ const d=new Date(ms); d.setHours(0,0,0,0); return d.getTime(); }
+    function nowMs(){ return Date.now()+timeOffsetMs; }
+    function targetStartMs(){ const t=new Date(SILK_TARGET_LOCAL); t.setHours(0,0,0,0); return t.getTime(); }
+    function realDaysLeft(){
+      const today = startOfDayMs(nowMs());
+      const target = targetStartMs();
+      const diff = Math.ceil((target - today) / 86400000);
+      return Math.max(diff, 0);
+    }
+    function setDocTitle(){ document.title = `D-${displayedDaysLeft()} · Silksong Countdown`; }
+    function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1400); }
+    function vibrate(p=[30,20,30]){ if(navigator.vibrate) navigator.vibrate(p); }
+    function ensureAC(){ try{ if(!audioContext) audioContext=new (window.AudioContext||window.webkitAudioContext)(); if(audioContext.state==='suspended') audioContext.resume(); }catch(_){} }
+
+    function spawnDecor(){
+      decor.innerHTML=''; const isBeautiful=document.body.getAttribute('data-theme')==='beautiful'; const n=isBeautiful?14:18;
+      for(let i=0;i<n;i++){ const s=document.createElement('span'); s.style.left=(Math.random()*100)+'%'; s.style.setProperty('--dur',(12+Math.random()*16)+'s'); s.style.setProperty('--s',(0.6+Math.random()*1.2).toFixed(2)); s.style.animationDelay=(-Math.random()*10)+'s'; decor.appendChild(s); }
+    }
+
+    // Confeti
+    function confettiBurst(colors){
+      const end=Date.now()+600; const palette=colors||['#ff3c91','#ff8ac9','#ffd1e6','#ff3a4a','#ff7a85','#fff'];
+      const interval=setInterval(function(){
+        if(Date.now()>end){ clearInterval(interval); return; }
+        for(let i=0;i<10;i++){
+          const c=document.createElement('div'); c.style.position='fixed'; c.style.zIndex='20';
+          c.style.width='8px'; c.style.height='14px'; c.style.background=palette[Math.floor(Math.random()*palette.length)];
+          c.style.left=Math.random()*100+'%'; c.style.top='-10px'; c.style.opacity='0.9'; c.style.transform='rotate('+(Math.random()*360)+'deg)';
+          c.style.transition='transform 700ms ease-out, top 700ms ease-out, opacity 700ms ease-out';
+          document.body.appendChild(c);
+          requestAnimationFrame(()=>{ c.style.top='110%'; c.style.transform+=' translateY(100vh)'; c.style.opacity='0'; });
+          setTimeout(()=>c.remove(),820);
+        }
+      }, 120);
+    }
+
+    // Pétalos (Beautiful)
+    function petalRain(count=22){
+      for(let i=0;i<count;i++){
+        const span=document.createElement('span'); span.className='petal'; span.textContent='🌸';
+        span.style.left= (Math.random()*100)+'%';
+        const dur = 1800 + Math.random()*900;
+        span.style.transition = `transform ${dur}ms ease-in, opacity ${dur}ms ease-in`;
+        document.body.appendChild(span);
+        requestAnimationFrame(()=>{
+          span.style.transform = `translateY(110vh) rotate(${(Math.random()*120-60)}deg)`;
+          span.style.opacity='0.9';
+        });
+        setTimeout(()=>span.remove(), dur+60);
+      }
+    }
+
+    // Garra SFX (Warrior)
+    function clawSFX(vol=0.9){
+      ensureAC(); if(!audioContext) return;
+      const ac=audioContext;
+      const t0 = ac.currentTime;
+
+      // burst de ruido
+      const dur = 0.08;
+      const buffer = ac.createBuffer(1, dur*ac.sampleRate, ac.sampleRate);
+      const data = buffer.getChannelData(0);
+      for(let i=0;i<data.length;i++){
+        // envolvente rápido decrescendo
+        const env = Math.pow(1 - i/data.length, 2.5);
+        data[i] = (Math.random()*2-1) * env;
+      }
+      const noise = ac.createBufferSource(); noise.buffer = buffer;
+      const hp = ac.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1800; hp.Q.value=0.9;
+      const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0+0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+      noise.connect(hp); hp.connect(g); g.connect(ac.destination); noise.start(t0);
+
+      // blip agudo
+      const o = ac.createOscillator(); const g2=ac.createGain(); o.type='triangle';
+      o.frequency.setValueAtTime(3000, t0);
+      o.frequency.exponentialRampToValueAtTime(900, t0+0.08);
+      g2.gain.setValueAtTime(0.0001, t0);
+      g2.gain.exponentialRampToValueAtTime(vol*0.7, t0+0.01);
+      g2.gain.exponentialRampToValueAtTime(0.0001, t0+0.1);
+      o.connect(g2); g2.connect(ac.destination); o.start(t0); o.stop(t0+0.12);
+
+      vibrate([12, 18, 10]);
+    }
+
+    // ====== Persistencia ======
+    function saveState(){
+      localStorage.setItem('BW_points', String(puntos));
+      localStorage.setItem('BW_theme', document.body.getAttribute('data-theme'));
+
+      localStorage.setItem('BW_silk_initial', silkInitialDays===null? '' : String(silkInitialDays));
+      localStorage.setItem('BW_silk_tearCount', String(silkTearCount));
+      localStorage.setItem('BW_silk_lastTear', silkLastTear);
+      localStorage.setItem('BW_silk_offsetMs', String(timeOffsetMs));
+      localStorage.setItem('BW_silk_offsetTs', String(offsetFetchedAt));
+      localStorage.setItem('BW_test_mode', testMode ? 'on' : 'off');
+      localStorage.setItem('BW_test_backlog', String(testBacklog));
+    }
+    function loadState(){
+      const t=localStorage.getItem('BW_theme'); if(t) setTheme(t);
+      const pts=localStorage.getItem('BW_points'); puntos=pts?parseInt(pts,10):0; puntosElement.textContent=puntos;
+
+      const si=localStorage.getItem('BW_silk_initial'); silkInitialDays = si? parseInt(si,10) : null;
+      silkTearCount = parseInt(localStorage.getItem('BW_silk_tearCount')||'0',10);
+      silkLastTear = localStorage.getItem('BW_silk_lastTear') || '';
+      timeOffsetMs = parseInt(localStorage.getItem('BW_silk_offsetMs')||'0',10);
+      offsetFetchedAt = parseInt(localStorage.getItem('BW_silk_offsetTs')||'0',10);
+      testMode = (localStorage.getItem('BW_test_mode')||'off')==='on';
+      testBacklog = parseInt(localStorage.getItem('BW_test_backlog')||'0',10);
+      document.body.classList.toggle('test-on', testMode);
+    }
+
+    // ====== Tiempo de red ======
+    async function syncTimeOffset(){
+      if(offsetFetchedAt && (Date.now()-offsetFetchedAt) < 12*60*60*1000) return;
+      try{
+        const res = await fetch('https://worldtimeapi.org/api/ip', {cache:'no-store'});
+        if(!res.ok) throw new Error('time fetch');
+        const data = await res.json();
+        const serverNow = Date.parse(data.datetime);
+        timeOffsetMs = serverNow - Date.now();
+        offsetFetchedAt = Date.now();
+        saveState();
+      }catch(_){
+        // offline: mantiene offset previo
+      }
+    }
+
+    // ====== Lógica contador ======
+    function displayedDaysLeft(){
+      const baseInit = (silkInitialDays===null? realDaysLeft() : silkInitialDays);
+      const calc = baseInit - silkTearCount + (testMode ? testBacklog : 0);
+      if(testMode) return Math.max(0, calc);
+      return Math.max(realDaysLeft(), calc);
+    }
+
+    function canTearToday(){
+      if(testMode) return true;
+      const today = formatYMD(nowMs());
+      if(silkLastTear === today) return false; // ya arrancaste hoy
+      return displayedDaysLeft() > realDaysLeft(); // solo si hay pendiente
+    }
+
+    const funnyMessages = [
+      "¡Eh, speedrunner! Una hoja por día o Hornet te hace parry.",
+      "Los espíritus del Hallownest dicen: mañana más.",
+      "Has intentado arrancar el mañana. Aprecio el entusiasmo.",
+      "Bandana check ✅, sonrisa ✅, hoja extra ❌",
+      "La vieja del bus aprueba: mona sí, tramposa no.",
+      "Hoy no hay cursiladas, hay reglas. Y se cumplen."
+    ];
+
+    function updateSilkUI(){
+      const real = realDaysLeft();
+      const disp = displayedDaysLeft();
+      silkDNumber.textContent = `D-${disp}`;
+      setDocTitle();
+
+      if(real === 0){
+        silkSub.textContent = "¡Silksong sale hoy! 🎉";
+        silkHint.textContent = "Listas las uñas. Listo el hype.";
+        silkCTA.style.display = 'flex';
+        noteSheet.setAttribute('aria-disabled','true');
+        noteSheet.style.pointerEvents = 'none';
+      } else {
+        const pendiente = Math.max(disp - real, 0);
+        silkSub.textContent = pendiente>0
+          ? `Faltan ${real} días reales. Tienes ${pendiente} hoja${pendiente>1?'s':''} pendiente${pendiente>1?'s':''}.`
+          : `Faltan ${real} día${real!==1?'s':''}. Vuelve mañana a arrancar.`;
+        silkCTA.style.display = 'none';
+        noteSheet.style.pointerEvents = 'auto';
+        noteSheet.removeAttribute('aria-disabled');
+      }
+
+      const today = formatYMD(nowMs());
+      if(silkLastTear === today && real>0){
+        silkHint.textContent = "Hoja de hoy arrancada. Mañana, más.";
+      } else if(real>0) {
+        silkHint.textContent = "Arrastra hacia abajo para arrancar ✨";
+      }
+    }
+
+    function tearSuccess(){
+      // Animaciones
+      noteSheet.classList.add('torn');
+      notePad.classList.add('shake');
+      setTimeout(()=>{ noteSheet.classList.remove('torn'); notePad.classList.remove('shake'); }, 540);
+
+      // Estado
+      const today = formatYMD(nowMs());
+      silkTearCount += 1;
+      silkLastTear = today;
+
+      puntos += 3; puntosElement.textContent = puntos;
+      showToast('+3 puntos · Hoja arrancada');
+
+      const theme = document.body.getAttribute('data-theme');
+      if(theme==='beautiful'){ confettiBurst(['#ff8ac9','#ffd1e6','#fff','#ff3c91']); petalRain(); }
+      else { confettiBurst(['#ff3a4a','#ff7a85','#ffd1e6','#ffffff']); clawSFX(); }
+
+      saveState();
+      updateSilkUI();
+    }
+
+    function denyTear(reason='intent'){
+      let msg = funnyMessages[Math.floor(Math.random()*funnyMessages.length)];
+      if(reason==='already') msg = "Esa hoja ya voló hoy. Mañana seguimos, guerrera.";
+      if(reason==='no-backlog') msg = "No puedes arrancar el mañana. Deja algo de drama para después.";
+      showToast(msg);
+      noteSheet.classList.remove('ripping');
+    }
+
+    function initSilk(){
+      if(silkInitialDays===null){
+        silkInitialDays = realDaysLeft();
+        silkTearCount = 0;
+        silkLastTear = '';
+        saveState();
+      }
+      updateSilkUI();
+    }
+
+    // Gestos
+    let dragging=false; let startY=0; let currentY=0; let pointerId=null;
+    const THRESHOLD = 64;
+
+    function onPointerDown(e){
+      if(noteSheet.getAttribute('aria-disabled')==='true') return;
+      pointerId = e.pointerId;
+      noteSheet.setPointerCapture(pointerId);
+      dragging=true; startY=e.clientY; currentY=0;
+      noteSheet.classList.add('ripping');
+    }
+    function onPointerMove(e){
+      if(!dragging || e.pointerId!==pointerId) return;
+      currentY = Math.max(0, e.clientY - startY);
+      const rot = Math.min(8, currentY/12);
+      noteSheet.style.transform = `translateY(${currentY}px) rotate(${rot}deg)`;
+    }
+    function onPointerUp(e){
+      if(!dragging || e.pointerId!==pointerId) return;
+      noteSheet.releasePointerCapture(pointerId);
+      dragging=false;
+      const passed = currentY > THRESHOLD;
+      noteSheet.style.transform = '';
+      noteSheet.classList.remove('ripping');
+
+      if(!passed) return;
+
+      const today = formatYMD(nowMs());
+      if(!testMode){
+        if(silkLastTear === today){ denyTear('already'); return; }
+        if(!(displayedDaysLeft() > realDaysLeft())){ denyTear('no-backlog'); return; }
+      }
+      tearSuccess();
+    }
+    function attachTearListeners(){
+      noteSheet.style.touchAction = 'none';
+      noteSheet.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+    }
+
+    // Modo prueba
+    function toggleTestMode(){
+      testMode = !testMode;
+      document.body.classList.toggle('test-on', testMode);
+      showToast(testMode ? 'Modo prueba ON' : 'Modo prueba OFF');
+      saveState();
+      updateSilkUI();
+    }
+    testModeBtn.addEventListener('click', toggleTestMode);
+    qaAddBacklog.addEventListener('click', ()=>{ testBacklog += 1; saveState(); updateSilkUI(); });
+    qaResetToday.addEventListener('click', ()=>{ silkLastTear = ''; saveState(); updateSilkUI(); showToast('Hoja de hoy reseteada'); });
+    qaResetAll.addEventListener('click', ()=>{
+      silkInitialDays = realDaysLeft();
+      silkTearCount = 0;
+      silkLastTear = '';
+      testBacklog = 0;
+      saveState(); updateSilkUI();
+      showToast('Bloc reiniciado');
+    });
+
+    // Share
+    silkShareBtn.addEventListener('click', async ()=>{
+      const msg = `Faltan D-${displayedDaysLeft()} para Hollow Knight: Silksong (4 sep 2025). Hype ON ⚔️✨`;
+      try{
+        if(navigator.share){
+          await navigator.share({ title:'Silksong Countdown', text:msg, url: location.href });
+        } else {
+          await navigator.clipboard.writeText(msg + ' ' + location.href);
+          showToast('Copiado al portapapeles 💫');
+        }
+      }catch(_){}
+    });
+
+    // PWA install
+    window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; installBtn.style.display='inline-flex'; });
+    installBtn?.addEventListener('click', async ()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if(outcome==='accepted'){ showToast('¡App instalada!'); } deferredPrompt=null; installBtn.style.display='none'; });
+    window.addEventListener('appinstalled', ()=>{ showToast('¡App instalada!'); installBtn.style.display='none'; });
+
+    // Reglas modal
+    reglasBtn.addEventListener('click', ()=>modalReglas.classList.add('active'));
+    cerrarReglas.addEventListener('click', ()=>modalReglas.classList.remove('active'));
+    modalReglas.addEventListener('click',(e)=>{ if(e.target===modalReglas) modalReglas.classList.remove('active'); });
+
+    // Init
+    function init(){
+      // Standalone/PWA
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        document.documentElement.classList.add('standalone-mode');
+        document.addEventListener('touchmove', function(e) { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+      }
+
+      loadState();
+      spawnDecor();
+
+      // Gato responsive
+      function sizeCat(){
+        const h1=document.querySelector('.brand h1'); if(!h1||!catHero) return;
+        if(window.innerWidth<=640){ const fs=parseFloat(getComputedStyle(h1).fontSize); const size=Math.min(fs*2.2, 132); catHero.style.width=size+'px'; catHero.style.height=size+'px'; }
+        else { catHero.style.width=''; catHero.style.height=''; }
+      }
+      sizeCat(); window.addEventListener('resize', sizeCat);
+
+      // Tiempo y contador
+      syncTimeOffset().finally(()=>{
+        initSilk();
+        attachTearListeners();
+        setDocTitle();
+        setInterval(updateSilkUI, 60*1000); // refresco por si cambia el día
+      });
+
+      // SW
+      if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js').catch(console.error); }); }
+    }
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
